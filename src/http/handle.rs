@@ -5,7 +5,7 @@ use url::Url;
 
 use ffi;
 use ffi::opt;
-use ffi::easy::Easy;
+use ffi::multi::Multi;
 use http::Response;
 use http::body::{Body,ToBody};
 use {ProgressCb,ErrCode};
@@ -16,12 +16,12 @@ use self::BodyType::{Fixed, Chunked};
 const DEFAULT_TIMEOUT_MS: usize = 30_000;
 
 pub struct Handle {
-    easy: Easy,
+    easy: Multi,
 }
 
 impl Handle {
     pub fn new() -> Handle {
-        return configure(Handle { easy: Easy::new() }
+        return configure(Handle { easy: Multi::new() }
             .timeout(DEFAULT_TIMEOUT_MS)
             .connect_timeout(DEFAULT_TIMEOUT_MS));
 

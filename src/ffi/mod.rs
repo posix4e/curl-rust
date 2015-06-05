@@ -6,5 +6,6 @@ pub mod easy;
 pub mod err;
 pub mod info;
 pub mod list;
+pub mod multi;
 pub mod opt;
 pub mod version;
