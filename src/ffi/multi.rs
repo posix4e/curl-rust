@@ -14,12 +14,12 @@ use curl_ffi as ffi;
 
 pub type ProgressCb<'a> = FnMut(usize, usize, usize, usize) + 'a;
 
-pub struct Multi {
+pub struct Multi2 {
     curl: *mut ffi::CURL
 }
 
-impl Multi {
-    pub fn new() -> Multi {
+impl Multi2 {
+    pub fn new() -> Multi2 {
         // Ensure that curl is globally initialized
         global_init();
 
@@ -29,7 +29,7 @@ impl Multi {
             p
         };
 
-        Multi { curl: handle }
+        Multi2 { curl: handle }
     }
 
     #[inline]
@@ -126,7 +126,7 @@ fn global_init() {
     }
 }
 
-impl Drop for Multi {
+impl Drop for Multi2 {
     fn drop(&mut self) {
         unsafe { ffi::curl_easy_cleanup(self.curl) }
     }

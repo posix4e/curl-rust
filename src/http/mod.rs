@@ -3,6 +3,7 @@ pub use self::response::{Headers,Response};
 
 pub mod body;
 pub mod handle;
+pub mod multi_handler;
 pub mod header;
 mod response;
 
