@@ -26,7 +26,6 @@ impl Multi {
         let handle = unsafe {
             let p = ffi::curl_multi_init();
             /* setup the generic multi interface options we want */
-            ffi::curl_multi_setopt(p, opt::SOCKETFUNCTION, curl_progress_fn);
 //            ffi::curl_multi_setopt(p, p, opt::SOCKETDATA, &p);
 //            ffi::curl_multi_setopt(p, CURLMOPT_TIMERFUNCTION, curl_progress_fn);
 //            ffi::curl_multi_setopt(p, CURLMOPT_TIMERDATA, &p);
@@ -45,8 +44,7 @@ impl Multi {
 
         unsafe {
             val.with_c_repr(|repr| {
-
-                res = err::ErrCode(ffi::curl_easy_setopt(self.curl, option, repr));
+            //    res = err::ErrCode(ffi::curl_multi_setopt(self.curl, option, repr));
             })
         }
 
@@ -59,7 +57,7 @@ impl Multi {
                    -> Result<Response, err::ErrCode> {
         let mut builder = ResponseBuilderM::new();
 
-        unsafe {
+/*        unsafe {
             let resp_p: usize = mem::transmute(&builder);
             let body_p: usize = match body {
                 Some(b) => mem::transmute(b),
@@ -94,7 +92,7 @@ impl Multi {
 
         // Try to get the response code
         builder.code = try!(self.get_response_code());
-
+*/
         Ok(builder.build())
     }
 
@@ -108,14 +106,14 @@ impl Multi {
 
     fn get_info_long(&self, key: info::Key) -> Result<c_long, err::ErrCode> {
         let v: c_long = 0;
-        let res = err::ErrCode(unsafe {
+/*        let res = err::ErrCode(unsafe {
             ffi::curl_easy_getinfo(self.curl as *const _, key, &v)
         });
 
         if !res.is_success() {
             return Err(res);
         }
-
+*/
         Ok(v)
     }
 }
@@ -135,7 +133,7 @@ fn global_init() {
 
 impl Drop for Multi {
     fn drop(&mut self) {
-        unsafe { ffi::curl_easy_cleanup(self.curl) }
+//        unsafe { ffi::curl_easy_cleanup(self.curl) }
     }
 }
 
