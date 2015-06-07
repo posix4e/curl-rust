@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::slice;
 use libc::{self, c_int, c_long, c_double, size_t};
 use super::{consts, err, info, opt};
-use super::err::ErrCode;
+use super::multi_err::*;
 use http::body::Body;
 use http::{header, Response};
 
@@ -38,13 +38,13 @@ impl Multi {
     }
 
     #[inline]
-    pub fn setopt<T: opt::OptVal>(&mut self, option: opt::Opt, val: T) -> Result<(), err::ErrCode> {
+    pub fn setopt<T: opt::OptVal>(&mut self, option: opt::Opt, val: T) -> Result<(), ErrCodeM> {
         // TODO: Prevent setting callback related options
-        let mut res = err::ErrCode(err::OK);
+        let mut res = ErrCodeM(OK);
 
         unsafe {
             val.with_c_repr(|repr| {
-                res = err::ErrCode(ffi::curl_multi_setopt(self.curl, option, repr));
+                res = ErrCodeM(ffi::curl_multi_setopt(self.curl, option, repr));
             })
         }
 
@@ -54,7 +54,7 @@ impl Multi {
     pub fn perform(&mut self,
                    body: Option<&mut Body>,
                    progress: Option<Box<ProgressCb>>)
-                   -> Result<Response, err::ErrCode> {
+                   -> Result<Response, ErrCodeM> {
         let mut builder = ResponseBuilderM::new();
 
 /*        unsafe {
@@ -96,15 +96,15 @@ impl Multi {
         Ok(builder.build())
     }
 
-    pub fn get_response_code(&self) -> Result<u32, err::ErrCode> {
+    pub fn get_response_code(&self) -> Result<u32, ErrCodeM> {
         Ok(try!(self.get_info_long(info::RESPONSE_CODE)) as u32)
     }
 
-    pub fn get_total_time(&self) -> Result<usize, err::ErrCode> {
+    pub fn get_total_time(&self) -> Result<usize, ErrCodeM> {
         Ok(try!(self.get_info_long(info::TOTAL_TIME)) as usize)
     }
 
-    fn get_info_long(&self, key: info::Key) -> Result<c_long, err::ErrCode> {
+    fn get_info_long(&self, key: info::Key) -> Result<c_long, ErrCodeM> {
         let v: c_long = 0;
 /*        let res = err::ErrCode(unsafe {
             ffi::curl_easy_getinfo(self.curl as *const _, key, &v)
