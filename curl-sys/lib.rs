@@ -1,8 +1,10 @@
 #![allow(non_camel_case_types, raw_pointer_derive)]
 
 extern crate libc;
-#[cfg(not(target_env = "msvc"))] extern crate libz_sys;
-#[cfg(unix)] extern crate openssl_sys;
+#[cfg(not(target_env = "msvc"))]
+extern crate libz_sys;
+#[cfg(unix)]
+extern crate openssl_sys;
 
 use libc::{c_void, c_int, c_char, c_uint, c_long};
 
@@ -54,165 +56,167 @@ pub struct curl_version_info_data {
 }
 
 impl Clone for curl_version_info_data {
-    fn clone(&self) -> Self { *self }
+    fn clone(&self) -> Self {
+        *self
+    }
 }
 
 pub const CURL_READFUNC_ABORT: c_int = 0x10000000;
 
-pub const CURLINFO_STRING: c_int   = 0x100000;
-pub const CURLINFO_LONG: c_int     = 0x200000;
-pub const CURLINFO_DOUBLE: c_int   = 0x300000;
-pub const CURLINFO_SLIST:  c_int   = 0x400000;
-pub const CURLINFO_MASK: c_int     = 0x0fffff;
+pub const CURLINFO_STRING: c_int = 0x100000;
+pub const CURLINFO_LONG: c_int = 0x200000;
+pub const CURLINFO_DOUBLE: c_int = 0x300000;
+pub const CURLINFO_SLIST: c_int = 0x400000;
+pub const CURLINFO_MASK: c_int = 0x0fffff;
 pub const CURLINFO_TYPEMASK: c_int = 0xf00000;
 
 pub const CURLINFO_EFFECTIVE_URL: CURLINFO = CURLINFO_STRING + 1;
 pub const CURLINFO_RESPONSE_CODE: CURLINFO = CURLINFO_LONG + 2;
 pub const CURLINFO_TOTAL_TIME: CURLINFO = CURLINFO_DOUBLE + 5;
 
-pub const CURLOPTTYPE_LONG: c_int          = 0;
-pub const CURLOPTTYPE_OBJECTPOINT: c_int   = 10_000;
+pub const CURLOPTTYPE_LONG: c_int = 0;
+pub const CURLOPTTYPE_OBJECTPOINT: c_int = 10_000;
 pub const CURLOPTTYPE_FUNCTIONPOINT: c_int = 20_000;
-pub const CURLOPTTYPE_OFF_T: c_int         = 30_000;
+pub const CURLOPTTYPE_OFF_T: c_int = 30_000;
 
-pub const CURL_VERSION_NOW: CURLversion    = CURLversion::CURL_VERSION_FOURTH;
-pub const CURL_VERSION_IPV6:         c_int = (1 << 0);
-pub const CURL_VERSION_KERBEROS4:    c_int = (1 << 1);
-pub const CURL_VERSION_SSL:          c_int = (1 << 2);
-pub const CURL_VERSION_LIBZ:         c_int = (1 << 3);
-pub const CURL_VERSION_NTLM:         c_int = (1 << 4);
+pub const CURL_VERSION_NOW: CURLversion = CURLversion::CURL_VERSION_FOURTH;
+pub const CURL_VERSION_IPV6: c_int = (1 << 0);
+pub const CURL_VERSION_KERBEROS4: c_int = (1 << 1);
+pub const CURL_VERSION_SSL: c_int = (1 << 2);
+pub const CURL_VERSION_LIBZ: c_int = (1 << 3);
+pub const CURL_VERSION_NTLM: c_int = (1 << 4);
 pub const CURL_VERSION_GSSNEGOTIATE: c_int = (1 << 5);
-pub const CURL_VERSION_DEBUG:        c_int = (1 << 6);
-pub const CURL_VERSION_ASYNCHDNS:    c_int = (1 << 7);
-pub const CURL_VERSION_SPNEGO:       c_int = (1 << 8);
-pub const CURL_VERSION_LARGEFILE:    c_int = (1 << 9);
-pub const CURL_VERSION_IDN:          c_int = (1 << 10);
-pub const CURL_VERSION_SSPI:         c_int = (1 << 11);
-pub const CURL_VERSION_CONV:         c_int = (1 << 12);
-pub const CURL_VERSION_CURLDEBUG:    c_int = (1 << 13);
-pub const CURL_VERSION_TLSAUTH_SRP:  c_int = (1 << 14);
-pub const CURL_VERSION_NTLM_WB:      c_int = (1 << 15);
-pub const CURL_VERSION_HTTP2:        c_int = (1 << 16);
+pub const CURL_VERSION_DEBUG: c_int = (1 << 6);
+pub const CURL_VERSION_ASYNCHDNS: c_int = (1 << 7);
+pub const CURL_VERSION_SPNEGO: c_int = (1 << 8);
+pub const CURL_VERSION_LARGEFILE: c_int = (1 << 9);
+pub const CURL_VERSION_IDN: c_int = (1 << 10);
+pub const CURL_VERSION_SSPI: c_int = (1 << 11);
+pub const CURL_VERSION_CONV: c_int = (1 << 12);
+pub const CURL_VERSION_CURLDEBUG: c_int = (1 << 13);
+pub const CURL_VERSION_TLSAUTH_SRP: c_int = (1 << 14);
+pub const CURL_VERSION_NTLM_WB: c_int = (1 << 15);
+pub const CURL_VERSION_HTTP2: c_int = (1 << 16);
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub enum CURLcode {
     CURLE_OK = 0,
-    CURLE_UNSUPPORTED_PROTOCOL,    /* 1 */
-    CURLE_FAILED_INIT,             /* 2 */
-    CURLE_URL_MALFORMAT,           /* 3 */
-    CURLE_NOT_BUILT_IN,            /* 4 - [was obsoleted in August 2007 for
+    CURLE_UNSUPPORTED_PROTOCOL, /* 1 */
+    CURLE_FAILED_INIT, /* 2 */
+    CURLE_URL_MALFORMAT, /* 3 */
+    CURLE_NOT_BUILT_IN, /* 4 - [was obsoleted in August 2007 for
                                 7.17.0, reused in April 2011 for 7.21.5] */
-    CURLE_COULDNT_RESOLVE_PROXY,   /* 5 */
-    CURLE_COULDNT_RESOLVE_HOST,    /* 6 */
-    CURLE_COULDNT_CONNECT,         /* 7 */
-    CURLE_FTP_WEIRD_SERVER_REPLY,  /* 8 */
-    CURLE_REMOTE_ACCESS_DENIED,    /* 9 a service was denied by the server
+    CURLE_COULDNT_RESOLVE_PROXY, /* 5 */
+    CURLE_COULDNT_RESOLVE_HOST, /* 6 */
+    CURLE_COULDNT_CONNECT, /* 7 */
+    CURLE_FTP_WEIRD_SERVER_REPLY, /* 8 */
+    CURLE_REMOTE_ACCESS_DENIED, /* 9 a service was denied by the server
                                 due to lack of access - when login fails
                                 this is not returned. */
-    CURLE_FTP_ACCEPT_FAILED,       /* 10 - [was obsoleted in April 2006 for
+    CURLE_FTP_ACCEPT_FAILED, /* 10 - [was obsoleted in April 2006 for
                                 7.15.4, reused in Dec 2011 for 7.24.0]*/
-    CURLE_FTP_WEIRD_PASS_REPLY,    /* 11 */
-    CURLE_FTP_ACCEPT_TIMEOUT,      /* 12 - timeout occurred accepting server
+    CURLE_FTP_WEIRD_PASS_REPLY, /* 11 */
+    CURLE_FTP_ACCEPT_TIMEOUT, /* 12 - timeout occurred accepting server
                                 [was obsoleted in August 2007 for 7.17.0,
                                 reused in Dec 2011 for 7.24.0]*/
-    CURLE_FTP_WEIRD_PASV_REPLY,    /* 13 */
-    CURLE_FTP_WEIRD_227_FORMAT,    /* 14 */
-    CURLE_FTP_CANT_GET_HOST,       /* 15 */
-    CURLE_OBSOLETE16,              /* 16 - NOT USED */
-    CURLE_FTP_COULDNT_SET_TYPE,    /* 17 */
-    CURLE_PARTIAL_FILE,            /* 18 */
-    CURLE_FTP_COULDNT_RETR_FILE,   /* 19 */
-    CURLE_OBSOLETE20,              /* 20 - NOT USED */
-    CURLE_QUOTE_ERROR,             /* 21 - quote command failure */
-    CURLE_HTTP_RETURNED_ERROR,     /* 22 */
-    CURLE_WRITE_ERROR,             /* 23 */
-    CURLE_OBSOLETE24,              /* 24 - NOT USED */
-    CURLE_UPLOAD_FAILED,           /* 25 - failed upload "command" */
-    CURLE_READ_ERROR,              /* 26 - couldn't open/read from file */
-    CURLE_OUT_OF_MEMORY,           /* 27 */
+    CURLE_FTP_WEIRD_PASV_REPLY, /* 13 */
+    CURLE_FTP_WEIRD_227_FORMAT, /* 14 */
+    CURLE_FTP_CANT_GET_HOST, /* 15 */
+    CURLE_OBSOLETE16, /* 16 - NOT USED */
+    CURLE_FTP_COULDNT_SET_TYPE, /* 17 */
+    CURLE_PARTIAL_FILE, /* 18 */
+    CURLE_FTP_COULDNT_RETR_FILE, /* 19 */
+    CURLE_OBSOLETE20, /* 20 - NOT USED */
+    CURLE_QUOTE_ERROR, /* 21 - quote command failure */
+    CURLE_HTTP_RETURNED_ERROR, /* 22 */
+    CURLE_WRITE_ERROR, /* 23 */
+    CURLE_OBSOLETE24, /* 24 - NOT USED */
+    CURLE_UPLOAD_FAILED, /* 25 - failed upload "command" */
+    CURLE_READ_ERROR, /* 26 - couldn't open/read from file */
+    CURLE_OUT_OF_MEMORY, /* 27 */
     /* Note: CURLE_OUT_OF_MEMORY may sometimes indicate a conversion error
        instead of a memory allocation error if CURL_DOES_CONVERSIONS
        is defined
        */
-    CURLE_OPERATION_TIMEDOUT,      /* 28 - the timeout time was reached */
-    CURLE_OBSOLETE29,              /* 29 - NOT USED */
-    CURLE_FTP_PORT_FAILED,         /* 30 - FTP PORT operation failed */
-    CURLE_FTP_COULDNT_USE_REST,    /* 31 - the REST command failed */
-    CURLE_OBSOLETE32,              /* 32 - NOT USED */
-    CURLE_RANGE_ERROR,             /* 33 - RANGE "command" didn't work */
-    CURLE_HTTP_POST_ERROR,         /* 34 */
-    CURLE_SSL_CONNECT_ERROR,       /* 35 - wrong when connecting with SSL */
-    CURLE_BAD_DOWNLOAD_RESUME,     /* 36 - couldn't resume download */
-    CURLE_FILE_COULDNT_READ_FILE,  /* 37 */
-    CURLE_LDAP_CANNOT_BIND,        /* 38 */
-    CURLE_LDAP_SEARCH_FAILED,      /* 39 */
-    CURLE_OBSOLETE40,              /* 40 - NOT USED */
-    CURLE_FUNCTION_NOT_FOUND,      /* 41 */
-    CURLE_ABORTED_BY_CALLBACK,     /* 42 */
-    CURLE_BAD_FUNCTION_ARGUMENT,   /* 43 */
-    CURLE_OBSOLETE44,              /* 44 - NOT USED */
-    CURLE_INTERFACE_FAILED,        /* 45 - CURLOPT_INTERFACE failed */
-    CURLE_OBSOLETE46,              /* 46 - NOT USED */
-    CURLE_TOO_MANY_REDIRECTS ,     /* 47 - catch endless re-direct loops */
-    CURLE_UNKNOWN_OPTION,          /* 48 - User specified an unknown option */
-    CURLE_TELNET_OPTION_SYNTAX ,   /* 49 - Malformed telnet option */
-    CURLE_OBSOLETE50,              /* 50 - NOT USED */
+    CURLE_OPERATION_TIMEDOUT, /* 28 - the timeout time was reached */
+    CURLE_OBSOLETE29, /* 29 - NOT USED */
+    CURLE_FTP_PORT_FAILED, /* 30 - FTP PORT operation failed */
+    CURLE_FTP_COULDNT_USE_REST, /* 31 - the REST command failed */
+    CURLE_OBSOLETE32, /* 32 - NOT USED */
+    CURLE_RANGE_ERROR, /* 33 - RANGE "command" didn't work */
+    CURLE_HTTP_POST_ERROR, /* 34 */
+    CURLE_SSL_CONNECT_ERROR, /* 35 - wrong when connecting with SSL */
+    CURLE_BAD_DOWNLOAD_RESUME, /* 36 - couldn't resume download */
+    CURLE_FILE_COULDNT_READ_FILE, /* 37 */
+    CURLE_LDAP_CANNOT_BIND, /* 38 */
+    CURLE_LDAP_SEARCH_FAILED, /* 39 */
+    CURLE_OBSOLETE40, /* 40 - NOT USED */
+    CURLE_FUNCTION_NOT_FOUND, /* 41 */
+    CURLE_ABORTED_BY_CALLBACK, /* 42 */
+    CURLE_BAD_FUNCTION_ARGUMENT, /* 43 */
+    CURLE_OBSOLETE44, /* 44 - NOT USED */
+    CURLE_INTERFACE_FAILED, /* 45 - CURLOPT_INTERFACE failed */
+    CURLE_OBSOLETE46, /* 46 - NOT USED */
+    CURLE_TOO_MANY_REDIRECTS, /* 47 - catch endless re-direct loops */
+    CURLE_UNKNOWN_OPTION, /* 48 - User specified an unknown option */
+    CURLE_TELNET_OPTION_SYNTAX, /* 49 - Malformed telnet option */
+    CURLE_OBSOLETE50, /* 50 - NOT USED */
     CURLE_PEER_FAILED_VERIFICATION, /* 51 - peer's certificate or fingerprint
                                  wasn't verified fine */
-    CURLE_GOT_NOTHING,             /* 52 - when this is a specific error */
-    CURLE_SSL_ENGINE_NOTFOUND,     /* 53 - SSL crypto engine not found */
-    CURLE_SSL_ENGINE_SETFAILED,    /* 54 - can not set SSL crypto engine as
+    CURLE_GOT_NOTHING, /* 52 - when this is a specific error */
+    CURLE_SSL_ENGINE_NOTFOUND, /* 53 - SSL crypto engine not found */
+    CURLE_SSL_ENGINE_SETFAILED, /* 54 - can not set SSL crypto engine as
                                 default */
-    CURLE_SEND_ERROR,              /* 55 - failed sending network data */
-    CURLE_RECV_ERROR,              /* 56 - failure in receiving network data */
-    CURLE_OBSOLETE57,              /* 57 - NOT IN USE */
-    CURLE_SSL_CERTPROBLEM,         /* 58 - problem with the local certificate */
-    CURLE_SSL_CIPHER,              /* 59 - couldn't use specified cipher */
-    CURLE_SSL_CACERT,              /* 60 - problem with the CA cert (path?) */
-    CURLE_BAD_CONTENT_ENCODING,    /* 61 - Unrecognized/bad encoding */
-    CURLE_LDAP_INVALID_URL,        /* 62 - Invalid LDAP URL */
-    CURLE_FILESIZE_EXCEEDED,       /* 63 - Maximum file size exceeded */
-    CURLE_USE_SSL_FAILED,          /* 64 - Requested FTP SSL level failed */
-    CURLE_SEND_FAIL_REWIND,        /* 65 - Sending the data requires a rewind
+    CURLE_SEND_ERROR, /* 55 - failed sending network data */
+    CURLE_RECV_ERROR, /* 56 - failure in receiving network data */
+    CURLE_OBSOLETE57, /* 57 - NOT IN USE */
+    CURLE_SSL_CERTPROBLEM, /* 58 - problem with the local certificate */
+    CURLE_SSL_CIPHER, /* 59 - couldn't use specified cipher */
+    CURLE_SSL_CACERT, /* 60 - problem with the CA cert (path?) */
+    CURLE_BAD_CONTENT_ENCODING, /* 61 - Unrecognized/bad encoding */
+    CURLE_LDAP_INVALID_URL, /* 62 - Invalid LDAP URL */
+    CURLE_FILESIZE_EXCEEDED, /* 63 - Maximum file size exceeded */
+    CURLE_USE_SSL_FAILED, /* 64 - Requested FTP SSL level failed */
+    CURLE_SEND_FAIL_REWIND, /* 65 - Sending the data requires a rewind
                                 that failed */
-    CURLE_SSL_ENGINE_INITFAILED,   /* 66 - failed to initialise ENGINE */
-    CURLE_LOGIN_DENIED,            /* 67 - user, password or similar was not
+    CURLE_SSL_ENGINE_INITFAILED, /* 66 - failed to initialise ENGINE */
+    CURLE_LOGIN_DENIED, /* 67 - user, password or similar was not
                                 accepted and we failed to login */
-    CURLE_TFTP_NOTFOUND,           /* 68 - file not found on server */
-    CURLE_TFTP_PERM,               /* 69 - permission problem on server */
-    CURLE_REMOTE_DISK_FULL,        /* 70 - out of disk space on server */
-    CURLE_TFTP_ILLEGAL,            /* 71 - Illegal TFTP operation */
-    CURLE_TFTP_UNKNOWNID,          /* 72 - Unknown transfer ID */
-    CURLE_REMOTE_FILE_EXISTS,      /* 73 - File already exists */
-    CURLE_TFTP_NOSUCHUSER,         /* 74 - No such user */
-    CURLE_CONV_FAILED,             /* 75 - conversion failed */
-    CURLE_CONV_REQD,               /* 76 - caller must register conversion
+    CURLE_TFTP_NOTFOUND, /* 68 - file not found on server */
+    CURLE_TFTP_PERM, /* 69 - permission problem on server */
+    CURLE_REMOTE_DISK_FULL, /* 70 - out of disk space on server */
+    CURLE_TFTP_ILLEGAL, /* 71 - Illegal TFTP operation */
+    CURLE_TFTP_UNKNOWNID, /* 72 - Unknown transfer ID */
+    CURLE_REMOTE_FILE_EXISTS, /* 73 - File already exists */
+    CURLE_TFTP_NOSUCHUSER, /* 74 - No such user */
+    CURLE_CONV_FAILED, /* 75 - conversion failed */
+    CURLE_CONV_REQD, /* 76 - caller must register conversion
                                 callbacks using curl_easy_setopt options
                                 CURLOPT_CONV_FROM_NETWORK_FUNCTION,
                                 CURLOPT_CONV_TO_NETWORK_FUNCTION, and
                                 CURLOPT_CONV_FROM_UTF8_FUNCTION */
-    CURLE_SSL_CACERT_BADFILE,      /* 77 - could not load CACERT file, missing
+    CURLE_SSL_CACERT_BADFILE, /* 77 - could not load CACERT file, missing
                                 or wrong format */
-    CURLE_REMOTE_FILE_NOT_FOUND,   /* 78 - remote file not found */
-    CURLE_SSH,                     /* 79 - error from the SSH layer, somewhat
+    CURLE_REMOTE_FILE_NOT_FOUND, /* 78 - remote file not found */
+    CURLE_SSH, /* 79 - error from the SSH layer, somewhat
                                 generic so the error message will be of
                                 interest when this has happened */
 
-    CURLE_SSL_SHUTDOWN_FAILED,     /* 80 - Failed to shut down the SSL
+    CURLE_SSL_SHUTDOWN_FAILED, /* 80 - Failed to shut down the SSL
                                 connection */
-    CURLE_AGAIN,                   /* 81 - socket is not ready for send/recv,
+    CURLE_AGAIN, /* 81 - socket is not ready for send/recv,
                                 wait till it's ready and try again (Added
                                 in 7.18.2) */
-    CURLE_SSL_CRL_BADFILE,         /* 82 - could not load CRL file, missing or
+    CURLE_SSL_CRL_BADFILE, /* 82 - could not load CRL file, missing or
                                 wrong format (Added in 7.19.0) */
-    CURLE_SSL_ISSUER_ERROR,        /* 83 - Issuer check failed.  (Added in
+    CURLE_SSL_ISSUER_ERROR, /* 83 - Issuer check failed.  (Added in
                                 7.19.0) */
-    CURLE_FTP_PRET_FAILED,         /* 84 - a PRET command failed */
-    CURLE_RTSP_CSEQ_ERROR,         /* 85 - mismatch of RTSP CSeq numbers */
-    CURLE_RTSP_SESSION_ERROR,      /* 86 - mismatch of RTSP Session Ids */
-    CURLE_FTP_BAD_FILE_LIST,       /* 87 - unable to parse FTP file list */
-    CURLE_CHUNK_FAILED,            /* 88 - chunk callback reported error */
+    CURLE_FTP_PRET_FAILED, /* 84 - a PRET command failed */
+    CURLE_RTSP_CSEQ_ERROR, /* 85 - mismatch of RTSP CSeq numbers */
+    CURLE_RTSP_SESSION_ERROR, /* 86 - mismatch of RTSP Session Ids */
+    CURLE_FTP_BAD_FILE_LIST, /* 87 - unable to parse FTP file list */
+    CURLE_CHUNK_FAILED, /* 88 - chunk callback reported error */
     CURLE_NO_CONNECTION_AVAILABLE, /* 89 - No connection available, the
                                 session will be queued */
     CURLE_LAST /* never use! */
@@ -467,8 +471,6 @@ ALIAS!(CURLOPT_WRITEDATA, CURLOPT_FILE);
 ALIAS!(CURLOPT_HEADERDATA, CURLOPT_WRITEHEADER);
 ALIAS!(CURLOPT_XFERINFODATA, CURLOPT_PROGRESSDATA);
 
-
-
 macro_rules! DEFOPTM {
     ($name:ident, $ty:ident, $num:expr) => (
         #[allow(dead_code)]
@@ -483,78 +485,75 @@ macro_rules! ALIASM {
     )
 }
 
-
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub enum CURLMcode {
-	CURLM_CALL_MULTI_PERFORM = -1, /* please call curl_multi_perform() or
+    CURLM_CALL_MULTI_PERFORM = -1, /* please call curl_multi_perform() or
                                     curl_multi_socket*() soon */
-  CURLM_OK,
-  CURLM_BAD_HANDLE,      /* the passed-in handle is not a valid CURLM handle */
-  CURLM_BAD_EASY_HANDLE, /* an easy handle was not good/valid */
-  CURLM_OUT_OF_MEMORY,   /* if you ever get this, you're in deep sh*t */
-  CURLM_INTERNAL_ERROR,  /* this is a libcurl bug */
-  CURLM_BAD_SOCKET,      /* the passed in socket argument did not match */
-  CURLM_UNKNOWN_OPTION,  /* curl_multi_setopt() with unsupported option */
-  CURLM_ADDED_ALREADY,   /* an easy handle already added to a multi handle was
+    CURLM_OK,
+    CURLM_BAD_HANDLE, /* the passed-in handle is not a valid CURLM handle */
+    CURLM_BAD_EASY_HANDLE, /* an easy handle was not good/valid */
+    CURLM_OUT_OF_MEMORY, /* if you ever get this, you're in deep sh*t */
+    CURLM_INTERNAL_ERROR, /* this is a libcurl bug */
+    CURLM_BAD_SOCKET, /* the passed in socket argument did not match */
+    CURLM_UNKNOWN_OPTION, /* curl_multi_setopt() with unsupported option */
+    CURLM_ADDED_ALREADY, /* an easy handle already added to a multi handle was
                             attempted to get added - again */
-  CURLM_LAST
+    CURLM_LAST
 }
 
+/* This is the socket callback function pointer */
+DEFOPTM!(CURLMOPT_SOCKETFUNCTION, FUNCTIONPOINT, 1);
+/* This is the argument passed to the socket callback */
+DEFOPTM!(CURLMOPT_SOCKETDATA, OBJECTPOINT, 2);
 
-  /* This is the socket callback function pointer */
-  DEFOPTM!(CURLMOPT_SOCKETFUNCTION, FUNCTIONPOINT, 1);
-   /* This is the argument passed to the socket callback */
-   DEFOPTM!(CURLMOPT_SOCKETDATA, OBJECTPOINT, 2);
+/* set to 1 to enable pipelining for this multi handle */
+DEFOPTM!(PIPELINING, LONG, 3);
 
-     /* set to 1 to enable pipelining for this multi handle */
-     DEFOPTM!(PIPELINING, LONG, 3);
+/* This is the timer callback function pointer */
+DEFOPTM!(TIMERFUNCTION, FUNCTIONPOINT, 4);
 
-    /* This is the timer callback function pointer */
-    DEFOPTM!(TIMERFUNCTION, FUNCTIONPOINT, 4);
+/* This is the argument passed to the timer callback */
+DEFOPTM!(TIMERDATA, OBJECTPOINT, 5);
 
-   /* This is the argument passed to the timer callback */
-   DEFOPTM!(TIMERDATA, OBJECTPOINT, 5);
+/* maximum number of entries in the connection cache */
+DEFOPTM!(MAXCONNECTS, LONG, 6);
 
-   /* maximum number of entries in the connection cache */
-   DEFOPTM!(MAXCONNECTS, LONG, 6);
+/* maximum number of (pipelining) connections to one host */
+DEFOPTM!(MAX_HOST_CONNECTIONS, LONG, 7);
 
-   /* maximum number of (pipelining) connections to one host */
-   DEFOPTM!(MAX_HOST_CONNECTIONS, LONG, 7);
+/* maximum number of requests in a pipeline */
+DEFOPTM!(MAX_PIPELINE_LENGTH, LONG, 8);
 
-   /* maximum number of requests in a pipeline */
-   DEFOPTM!(MAX_PIPELINE_LENGTH, LONG, 8);
-
-   /* a connection with a content-length longer than this
+/* a connection with a content-length longer than this
       will not be considered for pipelining */
-      DEFOPTM!(CONTENT_LENGTH_PENALTY_SIZE, OFF_T, 9);
+DEFOPTM!(CONTENT_LENGTH_PENALTY_SIZE, OFF_T, 9);
 
-   /* a connection with a chunk length longer than this
+/* a connection with a chunk length longer than this
       will not be considered for pipelining */
-      DEFOPTM!(CHUNK_LENGTH_PENALTY_SIZE, OFF_T, 10);
+DEFOPTM!(CHUNK_LENGTH_PENALTY_SIZE, OFF_T, 10);
 
-   /* a list of site names(+port) that are blacklisted from
+/* a list of site names(+port) that are blacklisted from
       pipelining */
-      DEFOPTM!(PIPELINING_SITE_BL, OBJECTPOINT, 11);
+DEFOPTM!(PIPELINING_SITE_BL, OBJECTPOINT, 11);
 
-   /* a list of server types that are blacklisted from
+/* a list of server types that are blacklisted from
       pipelining */
-      DEFOPTM!(PIPELINING_SERVER_BL, OBJECTPOINT, 12);
+DEFOPTM!(PIPELINING_SERVER_BL, OBJECTPOINT, 12);
 
-   /* maximum number of open connections in total */
-   DEFOPTM!(MAX_TOTAL_CONNECTIONS, LONG, 13);
+/* maximum number of open connections in total */
+DEFOPTM!(MAX_TOTAL_CONNECTIONS, LONG, 13);
 
-   //CURLMOPT_LASTENTRY /* the last unused */
+//CURLMOPT_LASTENTRY /* the last unused */
 
-
-  ALIASM!(LONG, CURLOPTTYPE_LONG);
-  ALIASM!(OBJECTPOINT, CURLOPTTYPE_OBJECTPOINT);
-  ALIASM!(FUNCTIONPOINT, CURLOPTTYPE_FUNCTIONPOINT);
-  ALIASM!(OFF_T, CURLOPTTYPE_OFF_T);
+ALIASM!(LONG, CURLOPTTYPE_LONG);
+ALIASM!(OBJECTPOINT, CURLOPTTYPE_OBJECTPOINT);
+ALIASM!(FUNCTIONPOINT, CURLOPTTYPE_FUNCTIONPOINT);
+ALIASM!(OFF_T, CURLOPTTYPE_OFF_T);
 
 extern {
 
-	// Easy curl mode (one thread per connection)
+    // Easy curl mode (one thread per connection)
     pub fn curl_easy_strerror(code: CURLcode) -> *const c_char;
     pub fn curl_easy_init() -> *mut CURL;
     pub fn curl_easy_setopt(curl: *mut CURL, option: CURLoption, ...) -> CURLcode;
@@ -569,8 +568,7 @@ extern {
 
     pub fn curl_global_cleanup();
 
-    pub fn curl_slist_append(list: *mut curl_slist,
-                             val: *const u8) -> *mut curl_slist;
+    pub fn curl_slist_append(list: *mut curl_slist, val: *const u8) -> *mut curl_slist;
     pub fn curl_slist_free_all(list: *mut curl_slist);
 
     pub fn curl_version() -> *const c_char;
