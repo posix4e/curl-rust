@@ -9,7 +9,7 @@ extern crate curl_sys as curl_ffi;
 #[cfg(unix)]
 extern crate openssl_sys as openssl;
 
-pub use ffi::multi::Multi2;
+pub use ffi::multi::Multi;
 pub use ffi::easy::ProgressCb;
 pub use ffi::err::ErrCode;
 
