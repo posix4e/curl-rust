@@ -44,7 +44,7 @@ impl Multi {
 
         unsafe {
             val.with_c_repr(|repr| {
-            //    res = err::ErrCode(ffi::curl_multi_setopt(self.curl, option, repr));
+                res = err::ErrCode(ffi::curl_multi_setopt(self.curl, option, repr));
             })
         }
 
