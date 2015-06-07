@@ -229,6 +229,10 @@ pub use curl_ffi::CURLOPT_WRITEDATA as WRITEDATA;
 pub use curl_ffi::CURLOPT_HEADERDATA as HEADERDATA;
 pub use curl_ffi::CURLOPT_XFERINFODATA as XFERINFODATA;
 
+// multi
+pub use curl_ffi::CURLMOPT_SOCKETFUNCTION as SOCKETFUNCTION;
+pub use curl_ffi::CURLMOPT_SOCKETDATA as SOCKETDATA;
+
 pub type Opt = ffi::CURLoption;
 
 pub trait OptVal {

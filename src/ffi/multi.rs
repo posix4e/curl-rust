@@ -14,22 +14,28 @@ use curl_ffi as ffi;
 
 pub type ProgressCb<'a> = FnMut(usize, usize, usize, usize) + 'a;
 
-pub struct Multi2 {
+pub struct Multi {
     curl: *mut ffi::CURL
 }
 
-impl Multi2 {
-    pub fn new() -> Multi2 {
+impl Multi {
+    pub fn new() -> Multi {
         // Ensure that curl is globally initialized
         global_init();
 
         let handle = unsafe {
             let p = ffi::curl_multi_init();
-            ffi::curl_easy_setopt(p, opt::NOPROGRESS, 0);
+            /* setup the generic multi interface options we want */
+            ffi::curl_multi_setopt(p, opt::SOCKETFUNCTION, curl_progress_fn);
+//            ffi::curl_multi_setopt(p, p, opt::SOCKETDATA, &p);
+//            ffi::curl_multi_setopt(p, CURLMOPT_TIMERFUNCTION, curl_progress_fn);
+//            ffi::curl_multi_setopt(p, CURLMOPT_TIMERDATA, &p);
+
+//            ffi::curl_multi_setopt(p, opt::NOPROGRESS, 0);
             p
         };
 
-        Multi2 { curl: handle }
+        Multi { curl: handle }
     }
 
     #[inline]
@@ -39,6 +45,7 @@ impl Multi2 {
 
         unsafe {
             val.with_c_repr(|repr| {
+
                 res = err::ErrCode(ffi::curl_easy_setopt(self.curl, option, repr));
             })
         }
@@ -50,7 +57,7 @@ impl Multi2 {
                    body: Option<&mut Body>,
                    progress: Option<Box<ProgressCb>>)
                    -> Result<Response, err::ErrCode> {
-        let mut builder = ResponseBuilder::new();
+        let mut builder = ResponseBuilderM::new();
 
         unsafe {
             let resp_p: usize = mem::transmute(&builder);
@@ -126,7 +133,7 @@ fn global_init() {
     }
 }
 
-impl Drop for Multi2 {
+impl Drop for Multi {
     fn drop(&mut self) {
         unsafe { ffi::curl_easy_cleanup(self.curl) }
     }
@@ -138,15 +145,15 @@ impl Drop for Multi2 {
  *
  */
 
-struct ResponseBuilder {
+struct ResponseBuilderM {
     code: u32,
     hdrs: HashMap<String,Vec<String>>,
     body: Vec<u8>
 }
 
-impl ResponseBuilder {
-    fn new() -> ResponseBuilder {
-        ResponseBuilder {
+impl ResponseBuilderM {
+    fn new() -> ResponseBuilderM {
+        ResponseBuilderM {
             code: 0,
             hdrs: HashMap::new(),
             body: Vec::new()
@@ -172,7 +179,7 @@ impl ResponseBuilder {
     }
 
     fn build(self) -> Response {
-        let ResponseBuilder { code, hdrs, body } = self;
+        let ResponseBuilderM { code, hdrs, body } = self;
         Response::new(code, hdrs, body)
     }
 }
@@ -198,9 +205,9 @@ extern fn curl_read_fn(p: *mut u8, size: size_t, nmemb: size_t,
 }
 
 extern fn curl_write_fn(p: *mut u8, size: size_t, nmemb: size_t,
-                        resp: *mut ResponseBuilder) -> size_t {
+                        resp: *mut ResponseBuilderM) -> size_t {
     if !resp.is_null() {
-        let builder: &mut ResponseBuilder = unsafe { mem::transmute(resp) };
+        let builder: &mut ResponseBuilderM = unsafe { mem::transmute(resp) };
         let chunk = unsafe { slice::from_raw_parts(p as *const u8,
                                                    (size * nmemb) as usize) };
         builder.body.extend(chunk.iter().map(|x| *x));
@@ -210,7 +217,7 @@ extern fn curl_write_fn(p: *mut u8, size: size_t, nmemb: size_t,
 }
 
 extern fn curl_header_fn(p: *mut u8, size: size_t, nmemb: size_t,
-                         resp: &mut ResponseBuilder) -> size_t {
+                         resp: &mut ResponseBuilderM) -> size_t {
     // TODO: Skip the first call (it seems to be the status line)
 
     let vec = unsafe { slice::from_raw_parts(p as *const u8,
