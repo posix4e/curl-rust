@@ -185,13 +185,6 @@ impl<'a, 'b> Request<'a, 'b> {
     }
 
     pub fn uri<U: ToUrl>(mut self, uri: U) -> Request<'a, 'b> {
-    /*    uri.with_url_str(|s| {
-            match self.handle.multi.setopt(opt::URL, s) {
-                Ok(_) => {}
-                Err(e) => self.err = Some(e)
-            }
-        });*/
-
         self
     }
 
@@ -251,113 +244,6 @@ impl<'a, 'b> Request<'a, 'b> {
     pub fn follow_redirects(mut self, follow: bool) -> Request<'a, 'b> {
         self.follow = follow;
         self
-    }
-
-    pub fn exec(self) -> Result<Response, ErrCodeM> {
-        // Deconstruct the struct
-        let Request {
-            err,
-            handle,
-            method,
-            mut headers,
-            mut body,
-            body_type,
-            content_type,
-            expect_continue,
-            progress,
-            follow,
-            ..
-        } = self;
-
-        if follow {
-            //try!(handle.multi.setopt(opt::FOLLOWLOCATION, 1));
-        }
-
-        match err {
-            Some(e) => return Err(e),
-            None => {}
-        }
-
-        // Clear custom headers set from the previous request
-        /*try!(handle.multi.setopt(opt::HTTPHEADER, 0));
-
-        match method {
-            Get => try!(handle.multi.setopt(opt::HTTPGET, 1)),
-            Head => try!(handle.multi.setopt(opt::NOBODY, 1)),
-            Post => try!(handle.multi.setopt(opt::POST, 1)),
-            Put => try!(handle.multi.setopt(opt::UPLOAD, 1)),
-            Patch => {
-                try!(handle.multi.setopt(opt::CUSTOMREQUEST, "PATCH"));
-                try!(handle.multi.setopt(opt::UPLOAD, 1));
-            },
-            Delete => {
-                if body.is_some() {
-                    try!(handle.multi.setopt(opt::UPLOAD, 1));
-                }
-
-                try!(handle.multi.setopt(opt::CUSTOMREQUEST, "DELETE"));
-            }
-            _ => unimplemented!()
-        }
-
-        match body.as_ref() {
-            None => {}
-            Some(body) => {
-                let body_type = body_type.unwrap_or(match body.get_size() {
-                    Some(len) => Fixed(len),
-                    None => Chunked,
-                });
-
-                match body_type {
-                    Fixed(len) => {
-                        match method {
-                            Post => try!(handle.multi.setopt(opt::POSTFIELDSIZE, len)),
-                            Put | Patch | Delete  => try!(handle.multi.setopt(opt::INFILESIZE, len)),
-                            _ => {}
-                        }
-                        append_header(&mut headers, "Content-Length",
-                                      &len.to_string());
-                    }
-                    Chunked => {
-                        append_header(&mut headers, "Transfer-Encoding",
-                                      "chunked");
-                    }
-
-                }
-
-                if !content_type {
-                    append_header(&mut headers, "Content-Type", "application/octet-stream");
-                }
-
-                if !expect_continue {
-                    append_header(&mut headers, "Expect", "");
-                }
-            }
-        }*/
-
-        let mut ffi_headers = ffi::List::new();
-
-        if !headers.is_empty() {
-            let mut buf = Vec::new();
-
-            for (k, v) in headers.iter() {
-                buf.extend(k.bytes());
-                buf.extend(": ".bytes());
-
-                for v in v.iter() {
-                    buf.extend(v.bytes());
-                    buf.push(0);
-                    ffi_headers.push_bytes(&buf);
-                    buf.truncate(k.len() + 2);
-                }
-
-                buf.truncate(0);
-            }
-
-        //    try!(handle.multi.setopt(opt::HTTPHEADER, &ffi_headers));
-        }
-
-        handle.multi.perform(body.as_mut(), progress)
     }
 }
 

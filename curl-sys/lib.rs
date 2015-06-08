@@ -10,6 +10,7 @@ use libc::{c_void, c_int, c_char, c_uint, c_long};
 
 pub type CURLINFO = c_int;
 pub type CURL = c_void;
+pub type CURLM = c_void;
 pub type curl_slist = c_void;
 pub type CURLoption = c_int;
 pub type CURLMoption = c_int;
@@ -562,8 +563,9 @@ extern {
     pub fn curl_easy_getinfo(curl: *const CURL, info: CURLINFO, ...) -> CURLcode;
 
     // Multi curl mode
-    pub fn curl_multi_init() -> *mut CURL;
-    pub fn curl_multi_setopt(curl: *mut CURL, option: CURLMoption, ...) -> CURLMcode;
+    pub fn curl_multi_cleanup(curl: *mut CURLM);
+    pub fn curl_multi_init() -> *mut CURLM;
+    pub fn curl_multi_setopt(curl: *mut CURLM, option: CURLMoption, ...) -> CURLMcode;
     pub fn curl_multi_strerror(code: CURLMcode) -> *const c_char;
 
     pub fn curl_global_cleanup();
