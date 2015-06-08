@@ -15,7 +15,7 @@ use curl_ffi as ffi;
 pub type ProgressCb<'a> = FnMut(usize, usize, usize, usize) + 'a;
 
 pub struct Multi {
-    curl: *mut ffi::CURL
+    curl: *mut ffi::CURLM
 }
 
 impl Multi {
@@ -50,72 +50,6 @@ impl Multi {
 
         if res.is_success() { Ok(()) } else { Err(res) }
     }
-
-    pub fn perform(&mut self,
-                   body: Option<&mut Body>,
-                   progress: Option<Box<ProgressCb>>)
-                   -> Result<Response, ErrCodeM> {
-        let mut builder = ResponseBuilderM::new();
-
-/*        unsafe {
-            let resp_p: usize = mem::transmute(&builder);
-            let body_p: usize = match body {
-                Some(b) => mem::transmute(b),
-                None => 0
-            };
-
-            let progress_p: usize = match progress.as_ref() {
-                Some(cb) => mem::transmute(cb),
-                None => 0
-            };
-
-            // Set callback options
-            ffi::curl_easy_setopt(self.curl, opt::READFUNCTION, curl_read_fn);
-            ffi::curl_easy_setopt(self.curl, opt::READDATA, body_p);
-
-            ffi::curl_easy_setopt(self.curl, opt::WRITEFUNCTION, curl_write_fn);
-            ffi::curl_easy_setopt(self.curl, opt::WRITEDATA, resp_p);
-
-            ffi::curl_easy_setopt(self.curl, opt::HEADERFUNCTION, curl_header_fn);
-            ffi::curl_easy_setopt(self.curl, opt::HEADERDATA, resp_p);
-
-            ffi::curl_easy_setopt(self.curl, opt::PROGRESSFUNCTION, curl_progress_fn);
-            ffi::curl_easy_setopt(self.curl, opt::PROGRESSDATA, progress_p);
-        }
-
-        let err = err::ErrCode(unsafe { ffi::curl_easy_perform(self.curl) });
-
-        // If the request failed, abort here
-        if !err.is_success() {
-            return Err(err);
-        }
-
-        // Try to get the response code
-        builder.code = try!(self.get_response_code());
-*/
-        Ok(builder.build())
-    }
-
-    pub fn get_response_code(&self) -> Result<u32, ErrCodeM> {
-        Ok(try!(self.get_info_long(info::RESPONSE_CODE)) as u32)
-    }
-
-    pub fn get_total_time(&self) -> Result<usize, ErrCodeM> {
-        Ok(try!(self.get_info_long(info::TOTAL_TIME)) as usize)
-    }
-
-    fn get_info_long(&self, key: info::Key) -> Result<c_long, ErrCodeM> {
-        let v: c_long = 0;
-/*        let res = err::ErrCode(unsafe {
-            ffi::curl_easy_getinfo(self.curl as *const _, key, &v)
-        });
-
-        if !res.is_success() {
-            return Err(res);
-        }
-*/
-        Ok(v)
-    }
 }
 
 #[inline]
@@ -127,13 +61,14 @@ fn global_init() {
     });
 
     extern fn cleanup() {
+        // TODO perhaps this and easy could check the cURL code.
         unsafe { ffi::curl_global_cleanup() }
     }
 }
 
 impl Drop for Multi {
     fn drop(&mut self) {
-//        unsafe { ffi::curl_easy_cleanup(self.curl) }
+        unsafe { ffi::curl_multi_cleanup(self.curl) }
     }
 }
 
