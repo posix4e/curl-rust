@@ -4,29 +4,32 @@ use std::path::Path;
 use url::Url;
 
 use ffi;
-use ffi::opt;
-use ffi::easy::Easy;
+use ffi::multi_opt;
+use ffi::multi::Multi;
 use http::Response;
+use ProgressCb;
+use ErrCodeM;
 use http::body::{Body,ToBody};
-use {ProgressCb,ErrCode};
-
-use self::Method::{Get, Head, Post, Put, Patch, Delete};
-use self::BodyType::{Fixed, Chunked};
+use http::handle::Method;
+use http::handle::Method::{Get, Head, Post, Put, Patch, Delete};
+use http::handle::BodyType;
+use http::handle::BodyType::{Fixed, Chunked};
+use http::handle::Handle;
 
 const DEFAULT_TIMEOUT_MS: usize = 30_000;
 
-pub struct Handle {
-    pub easy: Easy,
+pub struct MultiHandle {
+    multi: Multi,
 }
 
-impl Handle {
-    pub fn new() -> Handle {
-        return configure(Handle { easy: Easy::new() }
+impl MultiHandle {
+    pub fn new() -> MultiHandle {
+        return configure(MultiHandle { multi: Multi::new() }
             .timeout(DEFAULT_TIMEOUT_MS)
             .connect_timeout(DEFAULT_TIMEOUT_MS));
 
         #[cfg(unix)]
-        fn configure(handle: Handle) -> Handle {
+        fn configure(handle: MultiHandle) -> MultiHandle {
             let probe = ::openssl::probe::probe();
             let handle = match probe.cert_file {
                 Some(ref path) => handle.ssl_ca_info(path),
@@ -39,16 +42,19 @@ impl Handle {
         }
 
         #[cfg(not(unix))]
-        fn configure(handle: Handle) -> Handle { handle }
+        fn configure(handle: Handle) -> MultiHandle { handle }
+    }
+    pub fn add_connection(mut self, handle: Handle) {
+        self.multi.add_connection(handle.easy);
     }
 
-    pub fn timeout(mut self, ms: usize) -> Handle {
-        self.easy.setopt(opt::TIMEOUT_MS, ms).unwrap();
+    pub fn timeout(mut self, ms: usize) -> MultiHandle {
+//        self.multi.setopt(opt::TIMEOUT_MS, ms).unwrap();
         self
     }
 
-    pub fn connect_timeout(mut self, ms: usize) -> Handle {
-        self.easy.setopt(opt::CONNECTTIMEOUT_MS, ms).unwrap();
+    pub fn connect_timeout(mut self, ms: usize) -> MultiHandle {
+//        self.multi.setopt(opt::CONNECTTIMEOUT_MS, ms).unwrap();
         self
     }
 
@@ -58,8 +64,8 @@ impl Handle {
     ///
     /// The default for this option is 0 which means that this option is
     /// disabled.
-    pub fn low_speed_timeout(mut self, seconds: usize) -> Handle {
-        self.easy.setopt(opt::LOW_SPEED_TIME, seconds).unwrap();
+    pub fn low_speed_timeout(mut self, seconds: usize) -> MultiHandle {
+//        self.multi.setopt(opt::LOW_SPEED_TIME, seconds).unwrap();
         self
     }
 
@@ -69,45 +75,45 @@ impl Handle {
     ///
     /// The default for this option is 0 which means that this option is
     /// disabled.
-    pub fn low_speed_limit(mut self, bytes_per_second: usize) -> Handle {
-        self.easy.setopt(opt::LOW_SPEED_LIMIT, bytes_per_second).unwrap();
+    pub fn low_speed_limit(mut self, bytes_per_second: usize) -> MultiHandle {
+//        self.multi.setopt(opt::LOW_SPEED_LIMIT, bytes_per_second).unwrap();
         self
     }
 
-    pub fn verbose(mut self) -> Handle {
-        self.easy.setopt(opt::VERBOSE, 1).unwrap();
+    pub fn verbose(mut self) -> MultiHandle {
+//        self.multi.setopt(opt::VERBOSE, 1).unwrap();
         self
     }
 
-    pub fn proxy<U: ToUrl>(mut self, proxy: U) -> Handle {
+    pub fn proxy<U: ToUrl>(mut self, proxy: U) -> MultiHandle {
         proxy.with_url_str(|s| {
-            self.easy.setopt(opt::PROXY, s).unwrap();
+//            self.multi.setopt(opt::PROXY, s).unwrap();
         });
 
         self
     }
 
-    pub fn ssl_ca_path(mut self, path: &Path) -> Handle {
-        self.easy.setopt(opt::CAPATH, path).unwrap();
+    pub fn ssl_ca_path(mut self, path: &Path) -> MultiHandle {
+//        self.multi.setopt(opt::CAPATH, path).unwrap();
         self
     }
 
-    pub fn ssl_ca_info(mut self, path: &Path) -> Handle {
-        self.easy.setopt(opt::CAINFO, path).unwrap();
+    pub fn ssl_ca_info(mut self, path: &Path) -> MultiHandle {
+//        self.multi.setopt(opt::CAINFO, path).unwrap();
         self
     }
 
-    pub fn cookie_jar(mut self, path: &Path) -> Handle {
-        self.easy.setopt(opt::COOKIEJAR, path).unwrap();
+    pub fn cookie_jar(mut self, path: &Path) -> MultiHandle {
+//        self.multi.setopt(opt::COOKIEJAR, path).unwrap();
         self
     }
 
-    pub fn cookie_file(mut self, path: &Path) -> Handle {
-        self.easy.setopt(opt::COOKIEFILE, path).unwrap();
+    pub fn cookie_file(mut self, path: &Path) -> MultiHandle {
+//        self.multi.setopt(opt::COOKIEFILE, path).unwrap();
         self
     }
 
-    pub fn cookies(self, path: &Path) -> Handle {
+    pub fn cookies(self, path: &Path) -> MultiHandle {
         self.cookie_jar(path).cookie_file(path)
     }
 
@@ -136,22 +142,10 @@ impl Handle {
     }
 }
 
-#[derive(Copy, Clone)]
-pub enum Method {
-    Options,
-    Get,
-    Head,
-    Post,
-    Put,
-    Patch,
-    Delete,
-    Trace,
-    Connect
-}
 
 pub struct Request<'a, 'b> {
-    err: Option<ErrCode>,
-    handle: &'a mut Handle,
+    err: Option<ErrCodeM>,
+    handle: &'a mut MultiHandle,
     method: Method,
     headers: HashMap<String, Vec<String>>,
     body: Option<Body<'b>>,
@@ -162,13 +156,8 @@ pub struct Request<'a, 'b> {
     follow: bool,
 }
 
-pub enum BodyType {
-    Fixed(usize),
-    Chunked,
-}
-
 impl<'a, 'b> Request<'a, 'b> {
-    pub fn new(handle: &'a mut Handle, method: Method) -> Request<'a, 'b> {
+    pub fn new(handle: &'a mut MultiHandle, method: Method) -> Request<'a, 'b> {
         Request {
             err: None,
             handle: handle,
@@ -185,10 +174,6 @@ impl<'a, 'b> Request<'a, 'b> {
 
     pub fn uri<U: ToUrl>(mut self, uri: U) -> Request<'a, 'b> {
         uri.with_url_str(|s| {
-            match self.handle.easy.setopt(opt::URL, s) {
-                Ok(_) => {}
-                Err(e) => self.err = Some(e)
-            }
         });
 
         self
@@ -252,113 +237,8 @@ impl<'a, 'b> Request<'a, 'b> {
         self
     }
 
-    pub fn exec(self) -> Result<Response, ErrCode> {
-        // Deconstruct the struct
-        let Request {
-            err,
-            handle,
-            method,
-            mut headers,
-            mut body,
-            body_type,
-            content_type,
-            expect_continue,
-            progress,
-            follow,
-            ..
-        } = self;
-
-        if follow {
-            try!(handle.easy.setopt(opt::FOLLOWLOCATION, 1));
-        }
-
-        match err {
-            Some(e) => return Err(e),
-            None => {}
-        }
-
-        // Clear custom headers set from the previous request
-        try!(handle.easy.setopt(opt::HTTPHEADER, 0));
-
-        match method {
-            Get => try!(handle.easy.setopt(opt::HTTPGET, 1)),
-            Head => try!(handle.easy.setopt(opt::NOBODY, 1)),
-            Post => try!(handle.easy.setopt(opt::POST, 1)),
-            Put => try!(handle.easy.setopt(opt::UPLOAD, 1)),
-            Patch => {
-                try!(handle.easy.setopt(opt::CUSTOMREQUEST, "PATCH"));
-                try!(handle.easy.setopt(opt::UPLOAD, 1));
-            },
-            Delete => {
-                if body.is_some() {
-                    try!(handle.easy.setopt(opt::UPLOAD, 1));
-                }
-
-                try!(handle.easy.setopt(opt::CUSTOMREQUEST, "DELETE"));
-            }
-            _ => unimplemented!()
-        }
-
-        match body.as_ref() {
-            None => {}
-            Some(body) => {
-                let body_type = body_type.unwrap_or(match body.get_size() {
-                    Some(len) => Fixed(len),
-                    None => Chunked,
-                });
-
-                match body_type {
-                    Fixed(len) => {
-                        match method {
-                            Post => try!(handle.easy.setopt(opt::POSTFIELDSIZE, len)),
-                            Put | Patch | Delete  => try!(handle.easy.setopt(opt::INFILESIZE, len)),
-                            _ => {}
-                        }
-                        append_header(&mut headers, "Content-Length",
-                                      &len.to_string());
-                    }
-                    Chunked => {
-                        append_header(&mut headers, "Transfer-Encoding",
-                                      "chunked");
-                    }
-
-                }
-
-                if !content_type {
-                    append_header(&mut headers, "Content-Type", "application/octet-stream");
-                }
-
-                if !expect_continue {
-                    append_header(&mut headers, "Expect", "");
-                }
-            }
-        }
-
-        let mut ffi_headers = ffi::List::new();
-
-        if !headers.is_empty() {
-            let mut buf = Vec::new();
-
-            for (k, v) in headers.iter() {
-                buf.extend(k.bytes());
-                buf.extend(": ".bytes());
-
-                for v in v.iter() {
-                    buf.extend(v.bytes());
-                    buf.push(0);
-                    ffi_headers.push_bytes(&buf);
-                    buf.truncate(k.len() + 2);
-                }
-
-                buf.truncate(0);
-            }
-
-            try!(handle.easy.setopt(opt::HTTPHEADER, &ffi_headers));
-        }
-
-        handle.easy.perform(body.as_mut(), progress)
-    }
 }
+
 
 fn append_header(map: &mut HashMap<String, Vec<String>>, key: &str, val: &str) {
     match map.entry(key.to_string()) {
@@ -395,11 +275,12 @@ impl ToUrl for String {
 
 #[cfg(test)]
 mod tests {
-    use super::Handle;
+    use super::MultiHandle;
 
     #[test]
     fn get_header() {
-        let mut h = Handle::new();
+        let mut h = MultiHandler::new();
+
         let r = h.get("/foo").header("foo", "bar");
         assert_eq!(r.get_header("foo"), Some(&["bar".to_string()][..]));
     }
