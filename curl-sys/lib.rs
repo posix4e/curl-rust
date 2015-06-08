@@ -564,6 +564,7 @@ extern {
 
     // Multi curl mode
     pub fn curl_multi_cleanup(curl: *mut CURLM);
+    pub fn curl_multi_add_handle(curl: *mut CURLM, easy: *mut CURL) ->CURLMcode;
     pub fn curl_multi_init() -> *mut CURLM;
     pub fn curl_multi_setopt(curl: *mut CURLM, option: CURLMoption, ...) -> CURLMcode;
     pub fn curl_multi_strerror(code: CURLMcode) -> *const c_char;

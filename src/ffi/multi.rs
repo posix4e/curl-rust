@@ -9,6 +9,7 @@ use super::{consts, err, info, opt};
 use super::multi_err::*;
 use http::body::Body;
 use http::{header, Response};
+use super::easy::Easy;
 
 use curl_ffi as ffi;
 
@@ -35,6 +36,14 @@ impl Multi {
         };
 
         Multi { curl: handle }
+    }
+
+    pub fn add_connection(&mut self, easy: Easy) -> Result<(), ErrCodeM> {
+        let mut res = ErrCodeM(OK);
+
+        unsafe { res = ErrCodeM(ffi::curl_multi_add_handle(self.curl, easy.curl)); }
+
+        if res.is_success() { Ok(()) } else { Err(res) }
     }
 
     #[inline]
