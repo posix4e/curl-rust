@@ -162,7 +162,7 @@ pub struct Request<'a, 'b> {
     follow: bool,
 }
 
-enum BodyType {
+pub enum BodyType {
     Fixed(usize),
     Chunked,
 }
