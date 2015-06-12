@@ -1,5 +1,4 @@
 pub use self::handle::{Handle,Request,Method};
-
 pub use self::multi_handle::MultiHandle;
 pub use self::response::{Headers,Response};
 
@@ -8,8 +7,6 @@ pub mod handle;
 pub mod multi_handle;
 pub mod header;
 mod response;
-
-
 
 #[inline]
 pub fn handle() -> Handle {
