@@ -141,7 +141,7 @@ impl Drop for Easy {
 struct ResponseBuilder {
     code: u32,
     hdrs: HashMap<String,Vec<String>>,
-    body: Vec<u8>
+    body: Option<Vec<u8>>
 }
 
 impl ResponseBuilder {
@@ -149,7 +149,7 @@ impl ResponseBuilder {
         ResponseBuilder {
             code: 0,
             hdrs: HashMap::new(),
-            body: Vec::new()
+            body: Some(Vec::new())
         }
     }
 
@@ -203,7 +203,7 @@ extern fn curl_write_fn(p: *mut u8, size: size_t, nmemb: size_t,
         let builder: &mut ResponseBuilder = unsafe { mem::transmute(resp) };
         let chunk = unsafe { slice::from_raw_parts(p as *const u8,
                                                    (size * nmemb) as usize) };
-        builder.body.extend(chunk.iter().map(|x| *x));
+        builder.body.as_mut().unwrap().extend(chunk.iter().map(|x| *x));
     }
 
     size * nmemb

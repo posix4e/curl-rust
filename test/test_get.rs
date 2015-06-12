@@ -20,7 +20,7 @@ pub fn test_simple_get() {
   srv.assert();
 
   assert!(res.get_code() == 200, "code is {}", res.get_code());
-  assert!(res.get_body() == "Hello".as_bytes());
+  assert!(res.get_body().unwrap() == "Hello".as_bytes());
   assert!(res.get_headers().len() == 1);
   assert!(res.get_header("content-length") == ["5".to_string()]);
 }
@@ -46,7 +46,7 @@ pub fn test_get_with_custom_headers() {
   srv.assert();
 
   assert!(res.get_code() == 200);
-  assert!(res.get_body() == "Hello".as_bytes());
+  assert!(res.get_body().unwrap() == "Hello".as_bytes());
   assert!(res.get_headers().len() == 1);
   assert!(res.get_header("content-length") == ["5".to_string()]);
 }
@@ -110,5 +110,5 @@ pub fn follows_redirects() {
   srv2.assert();
 
   assert!(res.get_code() == 200);
-  assert_eq!(res.get_body(), b"response!");
+  assert_eq!(res.get_body().as_ref().unwrap(), b"response!");
 }
