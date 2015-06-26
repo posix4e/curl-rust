@@ -35,8 +35,8 @@ pub fn test_delete_binary_with_slice() {
                 \r\n\
                 Foo Bar Baz"),
         send!(b"HTTP/1.1 200 OK\r\n\
-                Content-Length: 5\r\n\r\n\
-                Hello\r\n\r\n")
+                Content-Length: 0\r\n\r\n\
+                \r\n\r\n")
     );
 
     let res = http::handle()
@@ -48,5 +48,5 @@ pub fn test_delete_binary_with_slice() {
     let res = res.unwrap();
 
     assert!(res.get_code() == 200);
-    assert!(res.get_body().unwrap() == "Hello".as_bytes());
+    assert!(res.get_body().unwrap() == "".as_bytes());
 }
