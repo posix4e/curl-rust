@@ -47,7 +47,7 @@ impl fmt::Display for Response {
         try!(write!(fmt, "Response {{{}, ", self.code));
 
         for (name, val) in self.hdrs.iter() {
-            try!(write!(fmt, "{}: {}, ", name, val.connect(", ")));
+            try!(write!(fmt, "{}: {}, ", name, val.join(", ")));
         }
 
         match str::from_utf8(&self.body) {

@@ -75,7 +75,7 @@ impl Handle {
     }
 
     pub fn verbose(mut self) -> Handle {
-        self.easy.setopt(opt::VERBOSE, 1).unwrap();
+        self.easy.setopt(opt::VERBOSE, 2).unwrap();
         self
     }
 

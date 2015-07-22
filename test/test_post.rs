@@ -53,7 +53,7 @@ pub fn test_post_binary_with_string() {
 }
 
 #[test]
-pub fn test_post_binary_with_reader() {
+pub fn test_post_binary_with_reader1() {
     let srv = server!(
         recv!(b"POST / HTTP/1.1\r\n\
                 Host: localhost:{PORT}\r\n\
@@ -72,7 +72,7 @@ pub fn test_post_binary_with_reader() {
     let res = http::handle()
         .post(server::url("/"), &mut body)
         .exec().unwrap();
-
+        println!("sdfsdfsfd");
     srv.assert();
 
     assert!(res.get_code() == 200);
