@@ -23,7 +23,7 @@ impl Handle {
     pub fn new() -> Handle {
         return configure(Handle { easy: Easy::new() }
             .timeout(DEFAULT_TIMEOUT_MS)
-            .connect_timeout(DEFAULT_TIMEOUT_MS));
+            .connect_timeout(DEFAULT_TIMEOUT_MS)).verbose();
 
         #[cfg(unix)]
         fn configure(handle: Handle) -> Handle {
@@ -302,6 +302,7 @@ impl<'a, 'b> Request<'a, 'b> {
         match body.as_ref() {
             None => {}
             Some(body) => {
+                println!("baz{:?}", body.get_size());
                 let body_type = body_type.unwrap_or(match body.get_size() {
                     Some(len) => Fixed(len),
                     None => Chunked,

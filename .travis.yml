@@ -1,5 +1,8 @@
 sudo: false
 language: rust
+before_script:
+  - ifconfig -a
+  - export RUST_BACKTRACE=1
 rust:
   - beta
   - stable
